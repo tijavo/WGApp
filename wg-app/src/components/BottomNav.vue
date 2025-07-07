@@ -14,7 +14,13 @@
 
             <!-- Mittleres Logo/Icon -->
             <div class="bottom-nav__center">
-                <img :src="centerIcon" alt="Logo" class="bottom-nav__center-icon" @click="onCenterIconClick" />
+                <div class="bottom-nav__center-background">
+                <Transition name="fade" mode="out-in">
+                    <img v-if="!loadingStore.isLoading" :src="centerIcon" alt="Logo" class="bottom-nav__center-icon" @click="onCenterIconClick" key="logo" />
+                    <ProgressSpinner v-else strokeWidth="8" fill="transparent" class="bottom-nav__center-icon" aria-label="Custom ProgressSpinner" key="spinner" />
+                </Transition>
+
+                </div>
             </div>
 
             <!-- Rechte Navigation Buttons -->
@@ -32,9 +38,13 @@
 </template>
 
 <script>
-
+import { useLoadingStore } from '@/stores/loading';
+import ProgressSpinner from 'primevue/progressspinner';
 export default {
     name: 'BottomNav',
+    components: {
+        ProgressSpinner
+    },
     data() {
         return {
             // Pfad zu deinem PNG Icon - ersetze durch deinen eigenen Pfad
@@ -48,7 +58,9 @@ export default {
             // Rechte Navigation Items
             rightNavItems: [
                 { name: 'Money', label: 'Money', icon: 'pi-shopping-cart', route: '/money' },
-            ]
+            ],
+
+            loadingStore: useLoadingStore() // Store für Ladezustände
         }
     },
 
@@ -155,16 +167,51 @@ export default {
     /* Lässt das Icon nach oben herausragen */
 }
 
-.bottom-nav__center-icon {
+.bottom-nav__center-background {
     width: 100px;
     height: 100px;
-    object-fit: contain;
     border-radius: 50%;
-    transition: transform 0.2s ease;
     background: var(--color-background);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border: 3px solid var(--color-border);
-    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.bottom-nav__center-icon {
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    object-fit: contain;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* Smooth fade transition für Loading States */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.3s ease;
+}
+
+.fade-enter-from {
+    opacity: 0;
+    transform: scale(0.8) rotate(180deg);
+}
+
+.fade-leave-to {
+    opacity: 0;
+    transform: scale(0.8) rotate(180deg);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
 }
 
 
@@ -191,9 +238,13 @@ export default {
     }
 
     .bottom-nav__center-icon {
+        width: calc(100% - 12px);
+        height: calc(100% - 12px);
+    }
+
+    .bottom-nav__center-background {
         width: 50px;
         height: 50px;
-        padding: 6px;
     }
 }
 </style>

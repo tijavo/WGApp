@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import { ref, onMounted } from 'vue';
 
 const user = ref(null);
+const loading = ref(false);
 
 onMounted(() => {
   // Check if a user is already selected in cookies
@@ -29,8 +30,8 @@ const updateUser = (newUser) => {
   <main class="main-content">
     <ChooseUser @user:updated="updateUser" :selectedUser="user" />
     <RouterView />
+    <BottomNav></BottomNav>
   </main>
-  <BottomNav></BottomNav>
 
 </template>
 <style scoped>
