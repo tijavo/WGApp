@@ -7,6 +7,25 @@ function doPost(e){
         status: "success",
         message: "POST request received"
     };
+
+    if (!e.parameter.path) {
+        response.status = "error";
+        response.message = "No path specified";
+        return ContentService.createTextOutput(JSON.stringify(response))
+                             .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    switch (e.parameter.path) {
+        case 'putzplanItems':
+            respone = postPutzplanItems(e);
+            break;
+        case 'goodbye':
+            response.message = "Goodbye, world!";
+            break;
+        default:
+            response.status = "error";
+            response.message = "Unknown path: " + e.parameter.path;
+    }
     
     return ContentService.createTextOutput(JSON.stringify(response))
                          .setMimeType(ContentService.MimeType.JSON);

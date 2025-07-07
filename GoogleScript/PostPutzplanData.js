@@ -1,4 +1,4 @@
-function postPutzplanData(e) {
+function postPutzplanItems(e) {
   try {
     // Prüfen ob Daten im Request vorhanden sind
     if (!e.postData.contents) {
@@ -12,7 +12,7 @@ function postPutzplanData(e) {
     const requestData = JSON.parse(e.postData.contents);
     
     // Spreadsheet öffnen
-    var spreadsheetId = "1k-YJwrEhvEnsMe0sXOa8ZTksunOrZXAvAYbW6Yfsdz8";
+    var spreadsheetId = PropertiesService.getScriptProperties().getProperty('putzplanSpreadsheetId');
     var spreadsheet = SpreadsheetApp.openById(spreadsheetId);
     var sheet = spreadsheet.getSheetByName("Tabellenblatt1");
 
@@ -24,42 +24,57 @@ function postPutzplanData(e) {
         'message': 'User not exists'
       })).setMimeType(ContentService.MimeType.JSON);
     }
-    var cleaned = requestData.cleaned;
+    var cleanedItems = requestData.cleanedItems;
+
+    if(!cleanedItems || cleanedItems.length == 0){
+      return ContentService.createTextOutput(JSON.stringify({
+        'status': 'error',
+        'message': 'No cleaned items provided'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
 
     var dataRange = sheet.getDataRange();
     var values = dataRange.getValues();
     var headers = values[2];
 
-    var column = 0;
-    for(column = 0; column < headers.length;column++){
-      if(headers[column] == cleaned){
-        break;
+    for(item of cleanedItems){
+      if(!item in headers){
+        return ContentService.createTextOutput(JSON.stringify({
+          'status': 'error',
+          'message': 'Cleaning task not exists: ' + item
+        })).setMimeType(ContentService.MimeType.JSON);
       }
     }
-    if(column >= headers.length){
+
+    var columnsToFill = [];
+
+    var column = 0;
+    for(column = 0; column < headers.length;column++){
+      if(headers[column] in cleanedItems){
+        columnsToFill.push(headers[column]);
+      }
+    }
+
+    if(columnsToFill.length == 0){
       return ContentService.createTextOutput(JSON.stringify({
         'status': 'error',
-        'message': 'Cleaning task not exists'
+        'message': 'No columns to fill found for cleaned items: ' + cleanedItems.join('; ')
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-
+    console.log('Columns to fill: ' + columnsToFill.join(', '));
+      
 
     var NextRow = sheet.getLastRow() + 1; // Nächste freie Zeile finden
+
+    return ContentService.createTextOutput(JSON.stringify({
+      'status': 'success',
+      'message': 'Next row to fill: ' + NextRow + ', columns: ' + columnsToFill.join(', ')
+    })).setMimeType(ContentService.MimeType.JSON);
 
     sheet.getRange(NextRow, 1).setValue(user); // Benutzername in die erste Spalte schreiben
     sheet.getRange(NextRow, column + 1).setValue(Utilities.formatDate(new Date(), "GMT", "dd/MM/yyyy")); // Datum in die Zelle schreiben
 
-    
-    // Hier können Sie die Daten in Ihr Sheet schreiben
-    // Beispiel:
-    // sheet.getRange(row, column).setValue(requestData.someValue);
-
-    // Erfolgreiche Antwort zurückgeben
-    return ContentService.createTextOutput(JSON.stringify({
-      'status': 'success',
-      'message': 'Try to add ' + user + ' cleaned: ' + cleaned + ' at row: ' + NextRow + ' column: ' + column,
-    })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
     // Fehlerbehandlung

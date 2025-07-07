@@ -3,32 +3,16 @@ import { RouterLink, RouterView } from 'vue-router'
 import BottomNav from './components/BottomNav.vue';
 import ChooseUser from './components/ChooseUser.vue';
 
-import Cookies from 'js-cookie';
 import { ref, onMounted } from 'vue';
 
-const user = ref(null);
 const loading = ref(false);
-
-onMounted(() => {
-  // Check if a user is already selected in cookies
-  const selectedUser = Cookies.get('selectedUser');
-  if (selectedUser) {
-    user.value = selectedUser;
-  }
-});
-
-const updateUser = (newUser) => {
-  user.value = newUser;
-  Cookies.set('selectedUser', newUser, { expires: 7 }); // Store selected user in cookies for 7 days
-};
-
 
 </script>
 
 <template>
 
   <main class="main-content">
-    <ChooseUser @user:updated="updateUser" :selectedUser="user" />
+    <ChooseUser />
     <RouterView />
     <BottomNav></BottomNav>
   </main>

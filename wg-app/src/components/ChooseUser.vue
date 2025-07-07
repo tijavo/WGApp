@@ -1,22 +1,33 @@
 <script>
+import { useUserStore } from '@/stores/user';
+import Cookies from 'js-cookie';
+
 export default {
     name: 'ChooseUser',
     props: {
-        selectedUser: {
-            type: String,
-        }
     },
     data() {
         return {
-            userList: import.meta.env.VITE_USERS.split(','), // Default users if not set
+            userList: import.meta.env.VITE_USERS.split(','), // Default users if not set,
+            selectedUser: useUserStore().user || null, 
         };
     },
     emits: ['user:updated'],
     methods: {
         selectUser(user) {
-            this.$emit('user:updated', user);
+            useUserStore().setUser(user);
+            this.selectedUser = user;
+            Cookies.set('selectedUser', user, { expires: 60 }); // Store selected user in cookies for 7 days
         },
     },
+    mounted(){
+        const selectedUser = Cookies.get('selectedUser');
+        if (selectedUser) {
+            console.log('User from cookies:', selectedUser);
+            useUserStore().setUser(selectedUser);
+            this.selectedUser = selectedUser;
+        }
+    }
 };
 </script>
 

@@ -4,6 +4,7 @@ import Listbox from 'primevue/listbox';
 
 import axios from 'axios';
 import { useLoadingStore } from '@/stores/loading'
+import { useUserStore } from '@/stores/user';
 
 export default {
     name: 'Putzplan',
@@ -20,7 +21,52 @@ export default {
         };
     },
     methods: {
-        // Hier können Methoden für den Putzplan definiert werden
+        formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() ist 0-basiert
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        },
+        postMessage() {
+            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, {
+                path: 'putzplanItems',
+            }).then(response => {
+                console.log('Daten erfolgreich gesendet:', response.data);
+            })
+            .catch(error => {
+                console.error('Fehler beim Senden der Daten:', error);
+            });
+            return
+
+            if (this.cleanedItems.length === 0) {
+                console.error('Keine Items ausgewählt');
+                return;
+            }
+            const user = useUserStore().user;
+            if (!user) {
+                console.error('Kein Benutzer ausgewählt');
+                return;
+            }
+            const payload = {
+                path: 'putzplanItems',
+                date: this.formatDate(this.date), // Formatieren des Datums
+                cleanedItems: this.cleanedItems.map(item => item.name), // Nur die Namen der Items senden
+                user: user
+            };
+            const url= import.meta.env.VITE_GOOGLE_BACKEND_URL;
+            console.log('Payload zum Senden:', payload);
+            console.log('Sende Daten an URL:', url);
+            this.loadingStore.startLoading(); // Ladezustand starten
+            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, payload)
+                .then(response => {
+                    console.log('Putzplan erfolgreich aktualisiert:', response.data);
+                    this.loadingStore.stopLoading(); // Ladezustand stoppen
+                })
+                .catch(error => {
+                    console.error('Fehler beim Aktualisieren des Putzplans:', error);
+                    this.loadingStore.stopLoading(); // Ladezustand stoppen
+                });
+        }
     },
     mounted() {
         const DATA = {
@@ -60,6 +106,9 @@ export default {
                         </div>
                     </template>
                 </Listbox>
+            </div>
+            <div @click="postMessage" class="p-button p-component p-button-outlined w-full border">
+                <span class="p-button-label">Putzplan aktualisieren</span>
             </div>
         </div>
     </div>
