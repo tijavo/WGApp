@@ -8,27 +8,37 @@ function doPost(e){
         message: "POST request received"
     };
 
-    if (!e.parameter.path) {
-        response.status = "error";
-        response.message = "No path specified";
-        return ContentService.createTextOutput(JSON.stringify(response))
-                             .setMimeType(ContentService.MimeType.JSON);
-    }
 
-    switch (e.parameter.path) {
-        case 'putzplanItems':
-            response = postPutzplanItems(e);
-            break;
-        case 'goodbye':
-            response.message = "Goodbye, world!";
-            break;
-        default:
+    try {
+        var json_postData = JSON.parse(e.postData.contents);
+
+        if (!json_postData.path) {
             response.status = "error";
-            response.message = "Unknown path: " + e.parameter.path;
-    }
+            response.message = "No path specified";
+            return ContentService.createTextOutput(JSON.stringify(response))
+                                .setMimeType(ContentService.MimeType.JSON);
+        }
     
-    return ContentService.createTextOutput(JSON.stringify(response))
-                         .setMimeType(ContentService.MimeType.JSON);
+        switch (json_postData.path) {
+            case 'putzplanItems':
+                response = postPutzplanItems(json_postData);
+                break;
+            case 'goodbye':
+                response.message = "Goodbye, world!";
+                break;
+            default:
+                response.status = "error";
+                response.message = "Unknown path: " + json_postData.path;
+        }
+        
+        return ContentService.createTextOutput(JSON.stringify(response))
+                            .setMimeType(ContentService.MimeType.JSON);
+    } catch (error) {
+        response.status = "error";
+        response.message = "Error processing request: " + error.message;
+        return ContentService.createTextOutput(JSON.stringify(response))
+                            .setMimeType(ContentService.MimeType.JSON);
+    }
 }
 
 

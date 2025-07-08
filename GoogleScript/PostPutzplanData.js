@@ -1,31 +1,28 @@
-function postPutzplanItems(e) {
+function postPutzplanItems(json_postData) {
   try {
     // Prüfen ob Daten im Request vorhanden sind
-    console.log('e.postData.conents',e.postData.conents)
-    if (!e.postData.contents) {
+    if (!json_postData) {
       return {
         'status': 'error',
         'message': 'No data received'
       };
     }
 
-    // JSON Daten aus dem Request parsen
-    const requestData = JSON.parse(e.postData.contents);
     
     // Spreadsheet öffnen
     var spreadsheetId = PropertiesService.getScriptProperties().getProperty('putzplanSpreadsheetId');
     var spreadsheet = SpreadsheetApp.openById(spreadsheetId);
     var sheet = spreadsheet.getSheetByName("Tabellenblatt1");
 
-    console.log(requestData);
-    var user = requestData.user;
+    console.log(json_postData);
+    var user = json_postData.user;
     if(!user in ['Till','Max','Simon']){
       return {
         'status': 'error',
         'message': 'User not exists'
       };
     }
-    var cleanedItems = requestData.cleanedItems;
+    var cleanedItems = json_postData.cleanedItems;
 
     if(!cleanedItems || cleanedItems.length == 0){
       return {
@@ -39,7 +36,7 @@ function postPutzplanItems(e) {
     var headers = values[2];
 
     for(item of cleanedItems){
-      if(!item in headers){
+      if(!headers.includes(item)){
         return {
           'status': 'error',
           'message': 'Cleaning task not exists: ' + item
@@ -51,8 +48,8 @@ function postPutzplanItems(e) {
 
     var column = 0;
     for(column = 0; column < headers.length;column++){
-      if(headers[column] in cleanedItems){
-        columnsToFill.push(headers[column]);
+      if(cleanedItems.includes(headers[column])){
+        columnsToFill.push(column);
       }
     }
 
@@ -67,15 +64,23 @@ function postPutzplanItems(e) {
       
 
     var NextRow = sheet.getLastRow() + 1; // Nächste freie Zeile finden
+    var date = json_postData.date
+
+    if(!json_postData.debug){
+      sheet.getRange(NextRow, 1).setValue(user); // Benutzername in die erste Spalte schreiben
+    
+      for (var i = 0; i < columnsToFill.length; i++) {
+        var col = columnsToFill[i] +1; // Spaltenindex anpassen
+        sheet.getRange(NextRow, col).setValue(date); // 'x' in die entsprechenden Spalten schreiben
+      }
+    }
+
 
     return {
       'status': 'success',
-      'message': 'Next row to fill: ' + NextRow + ', columns: ' + columnsToFill.join(', ')
+      'message': 'Next row to fill: ' + NextRow + ', columns: ' + columnsToFill.join(', ') + 'date: ' + date
     };
-
-    sheet.getRange(NextRow, 1).setValue(user); // Benutzername in die erste Spalte schreiben
-    sheet.getRange(NextRow, column + 1).setValue(Utilities.formatDate(new Date(), "GMT", "dd/MM/yyyy")); // Datum in die Zelle schreiben
-
+    
 
   } catch (error) {
     // Fehlerbehandlung
