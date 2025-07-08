@@ -17,7 +17,7 @@ function doPost(e){
 
     switch (e.parameter.path) {
         case 'putzplanItems':
-            respone = postPutzplanItems(e);
+            response = postPutzplanItems(e);
             break;
         case 'goodbye':
             response.message = "Goodbye, world!";
