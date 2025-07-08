@@ -1,6 +1,7 @@
 <script>
 import DatePicker from 'primevue/datepicker';
 import Listbox from 'primevue/listbox';
+import Button from 'primevue/button';
 
 import axios from 'axios';
 import { useLoadingStore } from '@/stores/loading'
@@ -10,7 +11,8 @@ export default {
     name: 'Putzplan',
     components: {
         DatePicker,
-        Listbox
+        Listbox,
+        Button
     },
     data() {
         return {
@@ -28,19 +30,6 @@ export default {
             return `${day}/${month}/${year}`;
         },
         postMessage() {
-            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, JSON.stringify({
-                path: 'putzplanItems',
-            }), {
-                headers: {
-                    'Content-Type': 'text/plain'
-                }
-            }).then(response => {
-                console.log('Daten erfolgreich gesendet:', response.data);
-            })
-            .catch(error => {
-                console.error('Fehler beim Senden der Daten:', error);
-            });
-            return
 
             if (this.cleanedItems.length === 0) {
                 console.error('Keine Items ausgewählt');
@@ -55,39 +44,46 @@ export default {
                 path: 'putzplanItems',
                 date: this.formatDate(this.date), // Formatieren des Datums
                 cleanedItems: this.cleanedItems.map(item => item.name), // Nur die Namen der Items senden
-                user: user
+                user: user,
+                debug: true
             };
             const url= import.meta.env.VITE_GOOGLE_BACKEND_URL;
             console.log('Payload zum Senden:', payload);
             console.log('Sende Daten an URL:', url);
             this.loadingStore.startLoading(); // Ladezustand starten
-            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, payload)
-                .then(response => {
+            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, JSON.stringify(payload), {
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            }).then(response => {
                     console.log('Putzplan erfolgreich aktualisiert:', response.data);
-                    this.loadingStore.stopLoading(); // Ladezustand stoppen
+                    this.getPutzplanItems(); // Putzplan-Items neu laden
                 })
                 .catch(error => {
                     console.error('Fehler beim Aktualisieren des Putzplans:', error);
                     this.loadingStore.stopLoading(); // Ladezustand stoppen
                 });
+        },
+        getPutzplanItems() {
+            const DATA = {
+                // Ihre Daten hier
+                path: 'getPutzplan',
+                // weitere Daten falls nötig
+            };
+            this.loadingStore.startLoading(); 
+            axios.get(import.meta.env.VITE_GOOGLE_BACKEND_URL + '?path=putzplanItems').then(response => {
+                console.log('Putzplan geladen:', response.data);
+                this.loadingStore.stopLoading(); 
+                this.itemsToClean = response.data.data; // Speichern der Putzplan-Items
+                // Hier kannst du den Putzplan weiterverarbeiten
+            }).catch(error => {
+                console.error('Fehler beim Laden des Putzplans:', error);
+                this.loadingStore.stopLoading();
+            });
         }
     },
     mounted() {
-        const DATA = {
-            // Ihre Daten hier
-            path: 'getPutzplan',
-            // weitere Daten falls nötig
-        };
-        this.loadingStore.startLoading(); 
-        axios.get(import.meta.env.VITE_GOOGLE_BACKEND_URL + '?path=putzplanItems').then(response => {
-            console.log('Putzplan geladen:', response.data);
-            this.loadingStore.stopLoading(); 
-            this.itemsToClean = response.data.data; // Speichern der Putzplan-Items
-            // Hier kannst du den Putzplan weiterverarbeiten
-        }).catch(error => {
-            console.error('Fehler beim Laden des Putzplans:', error);
-            this.loadingStore.stopLoading();
-        });
+        this.getPutzplanItems(); // Putzplan-Items beim Laden der Komponente abrufen
     }
 };
 </script>
@@ -111,9 +107,7 @@ export default {
                     </template>
                 </Listbox>
             </div>
-            <div @click="postMessage" class="p-button p-component p-button-outlined w-full border">
-                <span class="p-button-label">Putzplan aktualisieren</span>
-            </div>
+            <Button label="Putzplan aktualisieren" class="p-button-outlined w-full border" @click="postMessage" :disabled="loadingStore.isLoading"/>
         </div>
     </div>
 </template>
