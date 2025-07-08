@@ -28,8 +28,12 @@ export default {
             return `${day}/${month}/${year}`;
         },
         postMessage() {
-            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, {
+            axios.post(import.meta.env.VITE_GOOGLE_BACKEND_URL, JSON.stringify({
                 path: 'putzplanItems',
+            }), {
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
             }).then(response => {
                 console.log('Daten erfolgreich gesendet:', response.data);
             })
