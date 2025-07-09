@@ -42,19 +42,33 @@ app.post('/webhook', async (req, res) => {
         }
         
         if (req.body.ref === 'refs/heads/main') {
-            console.log('🚀 Deployment triggered by push to main');
+            console.log('Deployment triggered by push to main');
             
             // Repository in temporäres Verzeichnis klonen
-            await executeCommand('rm -rf /tmp/repo');
-            await executeCommand(`git clone ${REPO_URL} /tmp/repo`);
+            console.log('Cloning repository...');
+
+            // Schauen ob das Verzeichnis /tmp/repo existiert, falls ja pullen, sonst klonen
+            if (fs.existsSync('/tmp/repo')) {
+                console.log('Repository already exists, pulling latest changes...');
+                await executeCommand('cd /tmp/repo && git pull');
+            } else {
+                console.log('Repository does not exist, cloning...');
+                await executeCommand(`git clone ${REPO_URL} /tmp/repo`);
+                await executeCommand('cp /app/.env /tmp/repo/wg-app/.env');
+            }
             
             // Docker Compose verwenden um Vue App neu zu builden
-            await executeCommand(`cd /tmp/repo && docker-compose -f ${COMPOSE_FILE} build vue-app`);
+            console.log('Building Vue app...');
+            await executeCommand('cd /tmp/repo/wg-app && npm install && docker build -t vue-website:latest .');
             
             // Vue App Container neu starten
-            await executeCommand(`docker-compose -f ${COMPOSE_FILE} up -d vue-app`);
-            
+            console.log('Restarting Vue app container...');
+            await executeCommand('docker stop vue-website || true');
+            await executeCommand('docker rm vue-website || true');
+            await executeCommand('docker run -d --name vue-website --restart unless-stopped -p 3000:80 vue-website:latest');
+        
             // Alte Images aufräumen
+            console.log('Cleaning up old Docker images...');
             await executeCommand('docker image prune -f');
             
             console.log('✅ Deployment successful');
