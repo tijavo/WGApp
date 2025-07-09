@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  vue-app:
+    build:
+      context: ./wg-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: vue-website
+    restart: unless-stopped
+    labels:
+      - "webhook.enable=true"
+    
+  webhook-deployer:
+    build:
+      context: ./webhook
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    container_name: vue-webhook
+    restart: unless-stopped
+    environment:
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - REPO_URL=${REPO_URL}
+    volumes:
+      # Docker Socket für Container-Management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Docker Compose File mounten
+      - ./docker-compose.yml:/docker-compose.yml:ro
+    depends_on:
+      - vue-app
+
+volumes:
+  portainer_data:
