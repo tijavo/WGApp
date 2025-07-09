@@ -48,7 +48,7 @@ export default {
     data() {
         return {
             // Pfad zu deinem PNG Icon - ersetze durch deinen eigenen Pfad
-            centerIcon: '/src/assets/BungerLogo.png',
+            centerIcon: '/images/BungerLogo.png',
 
             // Linke Navigation Items
             leftNavItems: [
