@@ -1,2 +1,4 @@
 .env
 webhook/node_modules
+GoogleScript/.clasp.json
+GoogleScript/appscript.json
