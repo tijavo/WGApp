@@ -19,7 +19,8 @@ export default {
             date: new Date(),
             itemsToClean: [], // Hier können die Putzplan-Items Möglichkeiten gespeichert werden
             cleanedItems: [], // Hier können die ausgewählten Items gespeichert werden
-            loadingStore: useLoadingStore() // Store für Ladezustände
+            loadingStore: useLoadingStore(), // Store für Ladezustände
+            spreadSheetLink: ''
         };
     },
     methods: {
@@ -45,7 +46,7 @@ export default {
                 date: this.formatDate(this.date), // Formatieren des Datums
                 cleanedItems: this.cleanedItems.map(item => item.name), // Nur die Namen der Items senden
                 user: user,
-                debug: true
+                debug: false
             };
             const url= import.meta.env.VITE_GOOGLE_BACKEND_URL;
             console.log('Payload zum Senden:', payload);
@@ -75,6 +76,7 @@ export default {
                 console.log('Putzplan geladen:', response.data);
                 this.loadingStore.stopLoading(); 
                 this.itemsToClean = response.data.data; // Speichern der Putzplan-Items
+                this.spreadSheetLink = response.data.link; // Link zum Spreadsheet speichern
                 // Hier kannst du den Putzplan weiterverarbeiten
             }).catch(error => {
                 console.error('Fehler beim Laden des Putzplans:', error);
@@ -91,7 +93,7 @@ export default {
 <template>
     <div class="flex flex-col items-center justify-center">
         <div class="putzplan flex flex-col items-center justify-center gap-5">
-            <h1 class="putzplan-header">Putzplan</h1>
+            <h1 class="putzplan-header"><a :href="spreadSheetLink" target="_blank">Putzplan</a></h1>
             <div class="w-full">
                 <label for="date">Wähle ein Datum:</label>
                 <DatePicker v-model="date" showIcon fluid :showOnFocus="false" />
@@ -117,6 +119,16 @@ export default {
     font-size: 2rem;
     font-weight: bold;
     color: var(--color-heading);
+    padding-bottom: 0px;
+}
+
+.putzplan-header a {
+    color: var(--color-text-contrast);
+    text-decoration: none;
+}
+
+.putzplan-header a:hover {
+    text-decoration: underline;
 }
 
 .putzplan{

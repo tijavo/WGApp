@@ -28,5 +28,7 @@ function getPutzplanItems(){
     
     // Daten aus dem Sheet holen
     var data = getPutzplanSheetData(sheet);
-    return data;
+
+    var link = "https://docs.google.com/spreadsheets/d/" + spreadsheetId;
+    return [data, link];
 }

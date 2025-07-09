@@ -52,7 +52,7 @@ function doGet(e) {
     switch (e.parameter.path) {
         case 'putzplanItems':
             response.message = "Hier sind die Putzplan Items";
-            response.data = getPutzplanItems(); 
+            [response.data, response.link] = getPutzplanItems(); 
             break;
         case 'goodbye':
             response.message = "Goodbye, world!";
