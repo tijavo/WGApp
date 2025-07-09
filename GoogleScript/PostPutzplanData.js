@@ -53,6 +53,7 @@ function postPutzplanItems(json_postData) {
       }
     }
 
+
     if(columnsToFill.length == 0){
       return {
         'status': 'error',
@@ -73,6 +74,7 @@ function postPutzplanItems(json_postData) {
         var col = columnsToFill[i] +1; // Spaltenindex anpassen
         sheet.getRange(NextRow, col).setValue(date); // 'x' in die entsprechenden Spalten schreiben
       }
+      sheet.getRange(NextRow, column + 1).setValue('website'); // Aktuelles Datum in die letzte Spalte schreiben
     }
 
 
