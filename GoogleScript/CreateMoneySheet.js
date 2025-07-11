@@ -28,19 +28,21 @@ function createMoneySheet(name){
 
     // Copy the template sheet to create a new sheet
     var newSheet = sheet.copyTo(spreadsheet);
+    newSheet.showSheet();
     newSheet.setName(name);
 
     return {
         'message': "Sheet created successfully with name: " + name,
         'status': 'success',
         'sheetId': newSheet.getSheetId(),
+        'spreadsheetId': spreadsheetId 
     };
 }
 
 function postCreateMoneySheet(json_postData) {
     var date = json_postData.date;
     //get Month and Year from date
-    var month = new Date(date).getMonth() + 1; // Months are 0-indexed in JavaScript
+    var month = new Date(date).getMonth() ; // Months are 0-indexed in JavaScript
     var year = new Date(date).getFullYear();
 
     // Get Month Name
@@ -48,4 +50,12 @@ function postCreateMoneySheet(json_postData) {
     var name = monthName + " " + year;
     var response = createMoneySheet(name);
     return response;
+}
+
+function testCreateMoneySheet() {
+    var json_postData = {
+        date: "11.8.2025"
+    };
+    var response = postCreateMoneySheet(json_postData);
+    console.log(response);
 }
