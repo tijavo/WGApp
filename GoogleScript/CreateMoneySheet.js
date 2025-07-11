@@ -41,9 +41,7 @@ function createMoneySheet(name){
     };
 }
 
-function postCreateMoneySheet(json_postData) {
-    var date = json_postData.date;
-    //get Month and Year from date date is dd.mm.yyyy
+function getMoneySheetNameByDate(date) {
     if (!date || !/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(date)) {
         return {
             'message': "Invalid date format. Please use dd.mm.yyyy.",
@@ -66,7 +64,20 @@ function postCreateMoneySheet(json_postData) {
     // Get Month Name
     var monthName = Utilities.formatDate(new Date(year, month, 1), Session.getScriptTimeZone(), "MMMM");
     var name = monthName + " " + year;
-    var response = createMoneySheet(name);
+    return {
+        'name': name,
+        'status': 'success'
+    }
+}
+
+function postCreateMoneySheet(json_postData) {
+    var date = json_postData.date;
+    //get Month and Year from date date is dd.mm.yyyy
+    var name_data = getMoneySheetNameByDate(date);
+    if (name_data.status === 'error') {
+        return name_data; // Return error message if date is invalid
+    }
+    var response = createMoneySheet(name_data.name);
     return response;
 }
 

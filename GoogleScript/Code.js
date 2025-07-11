@@ -26,6 +26,12 @@ function doPost(e){
             case 'createMoneySheet':
                 response = postCreateMoneySheet(json_postData);
                 break;
+            case 'insertAusgaben':
+                response = insertAusgabenIntoSheet(json_postData);
+                break;
+            case 'insertSchulden':
+                response = insertSchuldenIntoSheet(json_postData);
+                break;
             case 'goodbye':
                 response.message = "Goodbye, world!";
                 break;

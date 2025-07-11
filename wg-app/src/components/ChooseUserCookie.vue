@@ -32,6 +32,7 @@ export default {
 
 <template>
     <div class="choose-user">
+        <h2>Wer bist du?</h2>
         <ChooseUser ref="chooseUser" @user:updated="selectUser" />
     </div>
 </template>
@@ -48,35 +49,4 @@ export default {
     color: var(--color-heading);
 }
 
-.choose-user ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.choose-user li {
-    margin: 10px 0;
-}
-
-.choose-user button {
-    padding: 10px 20px;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.choose-user button:hover {
-    background-color: var(--color-background-soft);
-}
-
-.choose-user .selected-user-button {
-    background-color: var(--color-text-contrast) !important;
-    color: black;
-}
-
-
-.choose-user p {
-    margin-top: 20px;
-    font-size: 18px;
-}
 </style>

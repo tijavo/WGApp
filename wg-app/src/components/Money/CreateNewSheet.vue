@@ -59,7 +59,7 @@ export default {
                     <p>Error creating sheet: {{ result.message }}</p>
                     <a v-if="result.sheetId" :href="'https://docs.google.com/spreadsheets/d/'+result.spreadsheetId +'/edit?gid=' + result.sheetId" target="_blank" rel="noopener noreferrer"> Hier geht es zum Sheet </a>
                 </div>
-                <div v-else class="text-green-400">
+                <div v-else class="green">
                     <p>Sheet created successfully: <br><a :href="'https://docs.google.com/spreadsheets/d/'+result.spreadsheetId +'/edit?gid=' + result.sheetId" target="_blank" rel="noopener noreferrer"> Hier geht es zum Sheet </a></p>
                 </div>
             </div>
