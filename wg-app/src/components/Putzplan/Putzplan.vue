@@ -93,7 +93,7 @@ export default {
 <template>
     <div class="flex flex-col items-center justify-center">
         <div class="putzplan flex flex-col items-center justify-center gap-5">
-            <h1 class="putzplan-header"><a :href="spreadSheetLink" target="_blank">Putzplan</a></h1>
+            <h1 class="putzplan-header"><a :href="spreadSheetLink" target="_blank" rel="noopener noreferrer">Putzplan</a></h1>
             <div class="w-full">
                 <label for="date">Wähle ein Datum:</label>
                 <DatePicker v-model="date" showIcon fluid :showOnFocus="false" />
