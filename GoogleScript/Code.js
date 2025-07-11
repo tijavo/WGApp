@@ -23,6 +23,9 @@ function doPost(e){
             case 'putzplanItems':
                 response = postPutzplanItems(json_postData);
                 break;
+            case 'createMoneySheet':
+                response = postCreateMoneySheet(json_postData);
+                break;
             case 'goodbye':
                 response.message = "Goodbye, world!";
                 break;
