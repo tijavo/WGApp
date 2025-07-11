@@ -83,7 +83,6 @@ export default {
 
 <template>
     <div class="flex flex-col items-center justify-center px-5 gap-7">
-        {{ userStore.user }}
         <div v-if="result" class="alert alert-success">
                 <div v-if="result.status === 'error'" class="text-red-400">
                     <p>Error inserting Row: {{ result.message }}</p>
