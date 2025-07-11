@@ -91,7 +91,7 @@ export default {
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center pb-20">
         <div class="putzplan flex flex-col items-center justify-center gap-5">
             <h1 class="putzplan-header"><a :href="spreadSheetLink" target="_blank" rel="noopener noreferrer">Putzplan</a></h1>
             <div class="w-full">
