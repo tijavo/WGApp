@@ -1,34 +1,38 @@
 <script>
+import { useUserStore } from '@/stores/user';
+import Cookies from 'js-cookie';
+import ChooseUser from './ChooseUser.vue'; // Import the ChooseUser component
 
 export default {
-    name: 'ChooseUser',
+    name: 'ChooseUserCookie',
+    components: {
+        ChooseUser
+    },
     data() {
         return {
-            userList: import.meta.env.VITE_USERS.split(','), // Default users if not set,
-            selectedUser: null, 
+            preSelectedUser: null, // This can be set to a default user if needed
         };
     },
-    emits: ['user:updated'],
     methods: {
         selectUser(user) {
-            console.log('Selected user:', user);
-            this.$emit('user:updated', user);
-            this.selectedUser = user;
+            useUserStore().setUser(user);
+            Cookies.set('selectedUser', user, { expires: 60 }); // Store selected user in cookies for 7 days
         },
     },
+    mounted(){
+        const selectedUser = Cookies.get('selectedUser');
+        if (selectedUser) {
+            console.log('User from cookies:', selectedUser);
+            this.$refs.chooseUser.selectUser(selectedUser);
+            useUserStore().setUser(selectedUser);
+        }
+    }
 };
 </script>
 
 <template>
     <div class="choose-user">
-        {{ userList.length > 0 ? '' : 'Keine Benutzer verfügbar, füge in der Env hinzu' }}
-        <h2>Wer bist du?</h2>
-        <div class="flex flex-row justify-center gap-5">
-            <div v-for="user in userList" :key="user">
-                <button @click="selectUser(user)" :class="[user == selectedUser ? 'selected-user-button' : '']">{{ user
-                }}</button>
-            </div>
-        </div>
+        <ChooseUser ref="chooseUser" @user:updated="selectUser" />
     </div>
 </template>
 

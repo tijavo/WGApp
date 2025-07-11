@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import BottomNav from './components/BottomNav.vue';
-import ChooseUser from './components/ChooseUser.vue';
+import ChooseUserCookie from './components/ChooseUserCookie.vue';
 
 import { ref, onMounted } from 'vue';
 
@@ -12,7 +12,7 @@ const loading = ref(false);
 <template>
 
   <main class="main-content">
-    <ChooseUser />
+    <ChooseUserCookie />
     <RouterView />
     <BottomNav></BottomNav>
   </main>
