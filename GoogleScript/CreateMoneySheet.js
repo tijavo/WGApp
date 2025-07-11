@@ -22,7 +22,9 @@ function createMoneySheet(name){
     if (existingSheet) {
         return {
             'message': "A sheet with this name already exists.",
-            'status': 'error'
+            'status': 'error',
+            'sheetId': existingSheet.getSheetId(),
+            'spreadsheetId': spreadsheetId 
         };
     }
 
@@ -41,12 +43,28 @@ function createMoneySheet(name){
 
 function postCreateMoneySheet(json_postData) {
     var date = json_postData.date;
-    //get Month and Year from date
-    var month = new Date(date).getMonth() ; // Months are 0-indexed in JavaScript
-    var year = new Date(date).getFullYear();
+    //get Month and Year from date date is dd.mm.yyyy
+    if (!date || !/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(date)) {
+        return {
+            'message': "Invalid date format. Please use dd.mm.yyyy.",
+            'status': 'error'
+        };
+    }
+    // Parse the date string to get month and year
+    var parts = date.split('.');
+    if (parts.length !== 3) {
+        return {
+            'message': "Invalid date format. Please use dd.mm.yyyy.",
+            'status': 'error'
+        };
+    }
+    var month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JavaScript
+    var year = parseInt(parts[2], 10);
+    console.log("Month: " + month);
+    console.log("Date: " + date);
 
     // Get Month Name
-    var monthName = Utilities.formatDate(new Date(year, month - 1, 1), Session.getScriptTimeZone(), "MMMM");
+    var monthName = Utilities.formatDate(new Date(year, month, 1), Session.getScriptTimeZone(), "MMMM");
     var name = monthName + " " + year;
     var response = createMoneySheet(name);
     return response;

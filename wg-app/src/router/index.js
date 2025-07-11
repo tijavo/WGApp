@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'putzplan',
       component: () => import('../components/Putzplan/Putzplan.vue'),
     },
+    {
+      path: '/money',
+      name: 'money',
+      component: () => import('../components/Money/Money.vue'),
+    }
   ],
 })
 
