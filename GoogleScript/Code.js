@@ -32,6 +32,9 @@ function doPost(e){
             case 'insertSchulden':
                 response = insertSchuldenIntoSheet(json_postData);
                 break;
+            case 'auth':
+                response = postAuthRequest(json_postData);
+                break;
             case 'goodbye':
                 response.message = "Goodbye, world!";
                 break;
@@ -59,15 +62,25 @@ function doGet(e) {
     };
 
     switch (e.parameter.path) {
-        case 'putzplanItems':
-            response.message = "Hier sind die Putzplan Items";
-            [response.data, response.link] = getPutzplanItems(); 
-            break;
-        case 'goodbye':
-            response.message = "Goodbye, world!";
-            break;
-        default:
-            response.status = "error";
+            case 'putzplanItems':
+                response.message = "Hier sind die Putzplan Items";
+                [response.data, response.link] = getPutzplanItems(); 
+                break;
+            case 'quittungen':
+                response = getQuittungen(e.parameter);
+                break;
+            case 'goodbye':
+                response.message = "Goodbye, world!";
+                break;
+            case 'testParameter':
+                response = {
+                    status: "success",
+                    message: "Test parameter received",
+                    data: e.parameter
+                }
+                break;
+            default:
+                response.status = "error";
             response.message = "Unknown path: " + e.parameter.path;
     }
     return ContentService

@@ -17,6 +17,16 @@ const router = createRouter({
       path: '/money',
       name: 'money',
       component: () => import('../components/Money/Money.vue'),
+    },
+    {
+      path: '/auth',
+      name: 'auth',
+      component: () => import('../components/Auth/Auth.vue'),
+    },
+    {
+      path: '/quittungen',
+      name: 'quittungen',
+      component: () => import('../components/Quittungen/Quittungen.vue'),
     }
   ],
 })
