@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/quittungen',
       name: 'quittungen',
       component: () => import('../components/Quittungen/Quittungen.vue'),
+    },
+    {
+      path: '/quittung/:name',
+      name: 'quittung',
+      component: () => import('../components/Quittungen/Quittung.vue'),
     }
   ],
 })

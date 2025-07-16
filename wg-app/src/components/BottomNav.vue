@@ -1,45 +1,8 @@
-<template>
-    <div class="bottom-nav">
-        <nav class="bottom-nav__container">
-            <!-- Linke Navigation Buttons -->
-            <button v-for="item in leftNavItems" :key="item.name" @click="navigateTo(item.route)" :class="[
-                'bottom-nav__item',
-                { 'bottom-nav__item--active': currentRoute === item.route }
-            ]">
-                <div class="bottom-nav__icon">
-                    <i class="pi" :class="item.icon"></i>
-                </div>
-                <span class="bottom-nav__label">{{ item.label }}</span>
-            </button>
-
-            <!-- Mittleres Logo/Icon -->
-            <div class="bottom-nav__center">
-                <div class="bottom-nav__center-background">
-                <Transition name="fade" mode="out-in">
-                    <img v-if="!loadingStore.isLoading" :src="centerIcon" alt="Logo" class="bottom-nav__center-icon" @click="onCenterIconClick" key="logo" />
-                    <ProgressSpinner v-else strokeWidth="8" fill="transparent" class="bottom-nav__center-icon" aria-label="Custom ProgressSpinner" key="spinner" />
-                </Transition>
-
-                </div>
-            </div>
-
-            <!-- Rechte Navigation Buttons -->
-            <button v-for="item in rightNavItems" :key="item.name" @click="navigateTo(item.route)" :class="[
-                'bottom-nav__item',
-                { 'bottom-nav__item--active': currentRoute === item.route }
-            ]">
-                <div class="bottom-nav__icon">
-                    <i class="pi" :class="item.icon"></i>
-                </div>
-                <span class="bottom-nav__label">{{ item.label }}</span>
-            </button>
-        </nav>
-    </div>
-</template>
 
 <script>
 import { useLoadingStore } from '@/stores/loading';
 import ProgressSpinner from 'primevue/progressspinner';
+import Cookies from 'js-cookie';
 export default {
     name: 'BottomNav',
     components: {
@@ -82,9 +45,56 @@ export default {
             // oder
             // this.$emit('center-icon-clicked')
         }
+    },
+    mounted() {
+        if (Cookies.get('authToken')) {
+            this.rightNavItems = [
+                { name: 'Money', label: 'Money', icon: 'pi-shopping-cart', route: '/money' },
+                { name: 'Quittungen', label: 'Quittungen', icon: 'pi-list', route: '/quittungen' },
+            ];
+        }
     }
 }
 </script>
+
+<template>
+    <div class="bottom-nav">
+        <nav class="bottom-nav__container">
+            <!-- Linke Navigation Buttons -->
+            <button v-for="item in leftNavItems" :key="item.name" @click="navigateTo(item.route)" :class="[
+                'bottom-nav__item',
+                { 'bottom-nav__item--active': currentRoute === item.route }
+            ]">
+                <div class="bottom-nav__icon">
+                    <i class="pi" :class="item.icon"></i>
+                </div>
+                <span class="bottom-nav__label">{{ item.label }}</span>
+            </button>
+
+            <!-- Mittleres Logo/Icon -->
+            <div class="bottom-nav__center">
+                <div class="bottom-nav__center-background">
+                <Transition name="fade" mode="out-in">
+                    <img v-if="!loadingStore.isLoading" :src="centerIcon" alt="Logo" class="bottom-nav__center-icon" @click="onCenterIconClick" key="logo" />
+                    <ProgressSpinner v-else strokeWidth="8" fill="transparent" class="bottom-nav__center-icon" aria-label="Custom ProgressSpinner" key="spinner" />
+                </Transition>
+
+                </div>
+            </div>
+
+            <!-- Rechte Navigation Buttons -->
+            <button v-for="item in rightNavItems" :key="item.name" @click="navigateTo(item.route)" :class="[
+                'bottom-nav__item',
+                { 'bottom-nav__item--active': currentRoute === item.route }
+            ]">
+                <div class="bottom-nav__icon">
+                    <i class="pi" :class="item.icon"></i>
+                </div>
+                <span class="bottom-nav__label">{{ item.label }}</span>
+            </button>
+        </nav>
+    </div>
+</template>
 
 <style scoped>
 .bottom-nav {

@@ -15,27 +15,36 @@ export default{
         return {
             result: null,
             loadingStore: useLoadingStore(), // Store for loading states
-            spreadSheetLink: ''
+            spreadSheetLink: '',
+            totalRecords: 0,
+            page: 1, // Current page for pagination
+            rows: 5 // Number of rows per page
         }
     },
     methods: {
+        getPage(e){
+            this.page = e.page +1; // PrimeVue paginator uses 0-based index, so we add 1
+            console.log('Page changed', e);
+            this.getQuittungen(); // Fetch quittungen for the new page
+            this.result = null; // Reset result for new page
+        },
         getQuittungen() {
-            const payload = {
-                'path': 'quittungen',
-                'auth': null
-            };
 
             this.loadingStore.startLoading(); 
-            axios.get(import.meta.env.VITE_GOOGLE_BACKEND_URL + '?path=quittungen&authToken=' +encodeURIComponent(Cookies.get('authToken'))).then(response => {
+            axios.get(import.meta.env.VITE_GOOGLE_BACKEND_URL + '?path=quittungen&page=' + this.page + '&pageSize=' + this.rows + '&authToken=' +encodeURIComponent(Cookies.get('authToken'))).then(response => {
                     console.log('Auth:', response.data);
                     this.result = response.data; // Store the result of the authentication
                     this.spreadSheetLink = response.data.link; // Store the spreadsheet link
+                    this.totalRecords = response.data.totalItems; // Update total records for pagination
                     this.loadingStore.stopLoading(); // Ladezustand stoppen
             })
             .catch(error => {
                 console.error('Fehler beim Authentifizieren:', error);
                 this.loadingStore.stopLoading(); // Ladezustand stoppen
             });
+        },
+        routeToQuittung(name) {
+            this.$router.push({ name: 'quittung', params: { name } }); // Navigate to the quittung component with the name as a parameter
         }
     },
     mounted() {
@@ -49,13 +58,14 @@ export default{
         <div class="putzplan flex flex-col items-center justify-center gap-5">
             <h1 class="quittung-header"><a :href="spreadSheetLink" target="_blank" rel="noopener noreferrer">Quittungen</a></h1>
             <div v-if="!result || result.status === 'error'" class="flex flex-col items-center justify-center gap-5">
-                <p>Keine Quittungen gefunden.</p>
+                <p>{{ loadingStore.isLoading ? 'Lade...' : 'Keine Quittungen gefunden.' }}</p>
             </div>
             <div v-else class="flex flex-col items-center justify-center w-full">
-                <div v-for="(quittung, index) in result.data" :key="index" class="quittung-item w-full">
+                <div @click="routeToQuittung(quittung.name)" v-for="(quittung, index) in result.data" :key="index" class="quittung-item w-full">
                     <div class="flex flex-row items-center justify-between">
                         <div class="quittung-details">
                             <h2>{{ quittung.name }}</h2>
+                            <p>{{ quittung.itemCount }} Items</p>
                         </div>
                         <div class="quittung-amount">
                             {{ quittung.amount }} €
@@ -63,7 +73,8 @@ export default{
                     </div>
                 </div>
             </div>
-            <Button label="Get Quittung" @click="getQuittungen" class="p-button-outlined w-full border" />
+            <paginator :rows="5" :totalRecords="totalRecords" :pageLinkSize="3" class="" template="PrevPageLink PageLinks NextPageLink"
+                @page="getPage" />
         </div>
     </div>
 </template>

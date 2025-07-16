@@ -69,6 +69,9 @@ function doGet(e) {
             case 'quittungen':
                 response = getQuittungen(e.parameter);
                 break;
+            case 'quittung':
+                response = getQuittungen(e.parameter);
+                break;
             case 'goodbye':
                 response.message = "Goodbye, world!";
                 break;

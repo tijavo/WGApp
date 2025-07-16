@@ -1,18 +1,19 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import BottomNav from './components/BottomNav.vue';
 import ChooseUserCookie from './components/ChooseUserCookie.vue';
 
-import { ref, onMounted } from 'vue';
+import { computed } from 'vue';
+const route = useRoute();
+const pathname = computed(() => route.path);
 
-const loading = ref(false);
 
 </script>
 
 <template>
 
   <main class="main-content">
-    <ChooseUserCookie />
+    <ChooseUserCookie v-if="['/putzplan','/','/money'].includes(pathname)" />
     <RouterView />
     <BottomNav></BottomNav>
   </main>
@@ -27,6 +28,7 @@ header {
 .main-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
   min-height: 100vh;
   background-color: var(--color-background);
 }
